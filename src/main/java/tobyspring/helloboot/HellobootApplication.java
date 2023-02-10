@@ -17,37 +17,26 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.web.context.support.GenericWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 public class HellobootApplication {
 
     public static void main(String[] args) {
         // 스프링 컨테이너를 만들어 봅시다.
-        GenericApplicationContext gac = new GenericApplicationContext();
+        GenericWebApplicationContext gwac = new GenericWebApplicationContext();
         // Assembler : 구체클래스간의 결합을 인터페이스로 약화시키고, 런타임 시점에 구체클래스를 사용할 수 있도록 DI해주는 역할을 말한다.
         // 스프링 컨테이너는 Assembler의 역할을 하고 있다.
         // Assembler의 구현 방법 1 : 생성자로 DI해주는 방법, Factory 호출시 전달, setter를 통해 주입
-        gac.registerBean(HelloController.class);
-        gac.registerBean(SimpleHelloService.class);
-        gac.refresh(); // 이때 bean을 생성함.
+        gwac.registerBean(HelloController.class);
+        gwac.registerBean(SimpleHelloService.class);
+        gwac.refresh(); // 이때 bean을 생성함.
 
         ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
         WebServer webServer = serverFactory.getWebServer(servletContext -> {
-            HelloController helloController = gac.getBean(HelloController.class);
-
-            servletContext.addServlet("hello", new HttpServlet() {
-                @Override
-                protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                    // 인증, 보안, 다국어, 공통 기능
-                    if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
-                        String name = req.getParameter("name");
-                        String ret = helloController.hello(name);
-                        resp.setContentType(MediaType.TEXT_PLAIN_VALUE);
-                        resp.getWriter().println(ret);
-                    }else {
-                        resp.setStatus(HttpStatus.NOT_FOUND.value());
-                    }
-                }
-            }).addMapping("/*");
+            servletContext.addServlet("dispatcherServlet", new DispatcherServlet(gwac))
+                    .addMapping("/*");
+            // handler 매핑 방법은 서블릿에서 직접 설정하거나, xml로 적어주거나, 애너테이션을 쓰거나
         });
         webServer.start();
     }
