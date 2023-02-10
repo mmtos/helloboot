@@ -1,5 +1,6 @@
 package tobyspring.helloboot;
 
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
@@ -22,7 +23,11 @@ public class HellobootApplication {
     public static void main(String[] args) {
         // 스프링 컨테이너를 만들어 봅시다.
         GenericApplicationContext gac = new GenericApplicationContext();
+        // Assembler : 구체클래스간의 결합을 인터페이스로 약화시키고, 런타임 시점에 구체클래스를 사용할 수 있도록 DI해주는 역할을 말한다.
+        // 스프링 컨테이너는 Assembler의 역할을 하고 있다.
+        // Assembler의 구현 방법 1 : 생성자로 DI해주는 방법, Factory 호출시 전달, setter를 통해 주입
         gac.registerBean(HelloController.class);
+        gac.registerBean(SimpleHelloService.class);
         gac.refresh(); // 이때 bean을 생성함.
 
         ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
