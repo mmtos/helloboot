@@ -8,6 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.Connector;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import tobyspring.helloboot.servlet.FrontController;
 
 public class HellobootApplication {
 
@@ -22,15 +26,7 @@ public class HellobootApplication {
 		});
 		WebServer webServer = servletWebServerFactory.getWebServer(servletContext -> {
 			// 서블릿 추가 및 URL 매핑
-			servletContext.addServlet("hello", new HttpServlet() {
-				@Override
-				protected void service(HttpServletRequest req, HttpServletResponse resp)
-						throws ServletException, IOException {
-					resp.setStatus(HttpServletResponse.SC_OK);
-					resp.setHeader("Content-Type", "text/plain");
-					resp.getWriter().println("Hello Servlet");
-				}
-			}).addMapping("/hello");
+			servletContext.addServlet("front", new FrontController()).addMapping("/*");
 		});
 		webServer.start();
 	}
