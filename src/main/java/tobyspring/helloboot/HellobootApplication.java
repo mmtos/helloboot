@@ -23,22 +23,29 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class HellobootApplication {
 
     public static void main(String[] args) {
-        // 스프링 컨테이너를 만들어 봅시다.
-        GenericWebApplicationContext gwac = new GenericWebApplicationContext();
+        // 스프링 컨테이너 refresh 시점에 톰캣 실행과정 통합
+        GenericWebApplicationContext gwac = new GenericWebApplicationContext(){
+            @Override
+            protected void onRefresh() {
+                super.onRefresh();
+                ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+                WebServer webServer = serverFactory.getWebServer(servletContext -> {
+                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this))
+                            .addMapping("/*");
+                    // handler 매핑 방법은 서블릿에서 직접 설정하거나, xml로 적어주거나, 애너테이션을 쓰거나
+                });
+                webServer.start();
+            }
+        };
+
         // Assembler : 구체클래스간의 결합을 인터페이스로 약화시키고, 런타임 시점에 구체클래스를 사용할 수 있도록 DI해주는 역할을 말한다.
         // 스프링 컨테이너는 Assembler의 역할을 하고 있다.
         // Assembler의 구현 방법 1 : 생성자로 DI해주는 방법, Factory 호출시 전달, setter를 통해 주입
         gwac.registerBean(HelloController.class);
         gwac.registerBean(SimpleHelloService.class);
-        gwac.refresh(); // 이때 bean을 생성함.
+        gwac.refresh(); // 이때 bean을 생성함. template method라서 훅을 추가할 수 있다.
 
-        ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-        WebServer webServer = serverFactory.getWebServer(servletContext -> {
-            servletContext.addServlet("dispatcherServlet", new DispatcherServlet(gwac))
-                    .addMapping("/*");
-            // handler 매핑 방법은 서블릿에서 직접 설정하거나, xml로 적어주거나, 애너테이션을 쓰거나
-        });
-        webServer.start();
+
     }
 
 }
