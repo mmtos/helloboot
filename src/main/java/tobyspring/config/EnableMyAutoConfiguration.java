@@ -10,6 +10,6 @@ import tobyspring.config.autoconfig.TomcatWebServerConfig;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Import({TomcatWebServerConfig.class, DispatcherServletConfig.class})
+@Import(MyAutoConfigImportSelector.class)
 public @interface EnableMyAutoConfiguration {
 }
