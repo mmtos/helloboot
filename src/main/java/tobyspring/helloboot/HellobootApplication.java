@@ -10,6 +10,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
 @ComponentScan
+// HTTPie http -v ":8080/hello?name=jsh
 public class HellobootApplication {
     @Bean
     public ServletWebServerFactory servletWebServerFactory() {
