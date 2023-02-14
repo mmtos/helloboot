@@ -3,26 +3,16 @@ package tobyspring.helloboot;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-// 스프링 컨테이너가 이안에 자바코드 설정정보가 있다는걸 알게 만들어야함
-@Configuration
+/**
+ * curl http://localhost:8080/hello?name=jsh
+ */
+
+@ComponentScan
 public class HellobootApplication {
-
-    @Bean
-    public HelloService helloService(){
-       return  new SimpleHelloService();
-    }
-
-    // factory method를 이용해서 빈 구성정보 정의
-    @Bean
-    public HelloController helloController(HelloService helloService){
-        return new HelloController(helloService);
-    }
-
     public static void main(String[] args) {
         // 스프링 컨테이너 refresh 시점에 톰캣 실행과정 통합
         AnnotationConfigWebApplicationContext acwac = new AnnotationConfigWebApplicationContext(){
@@ -48,8 +38,9 @@ public class HellobootApplication {
 
         //annotation 기반 설정을 사용한 스프링 컨테이너는 더이상 registerBean을 사용하지 못함
         acwac.register(HellobootApplication.class);
+
+        // 간편하고 표준적인 방식이지만, 빈이 많아질수록 어떤 빈들이 있는지 찾기 어렵다.
+//        acwac.scan("tobyspring.helloboot");
         acwac.refresh();
-
     }
-
 }
