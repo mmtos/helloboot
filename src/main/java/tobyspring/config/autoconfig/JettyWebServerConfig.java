@@ -1,5 +1,6 @@
 package tobyspring.config.autoconfig;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import tobyspring.config.autoconfig.JettyWebServerConfig.JettyCondition;
 @ConditionalMyOnClass("org.eclipse.jetty.server.Server")
 public class JettyWebServerConfig {
     @Bean
+    @ConditionalOnMissingBean
     // 빈의 이름은 메소드 이름을 따라간다.
     public ServletWebServerFactory jettyWebServerFactory() {
         return new JettyServletWebServerFactory();
